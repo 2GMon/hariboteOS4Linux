@@ -1,3 +1,4 @@
+; Copyright (c) 2014 Takaaki TSUJIMOTO
     ORG  0x7c00   ; このプログラムがどこに読み込まれるのか
 
 ; 以下は標準的なFAT12フォーマットフロッピーディスクのための記述

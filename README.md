@@ -8,3 +8,7 @@
 * nasm
 * qemu
 * mformat
+
+## LICENSE
+
+このソフトウェアは、MITライセンスのもとで公開されています。LICENSE.txtを参照してください。
