@@ -1,13 +1,21 @@
-SRC = helloos.nas
-TARGET = helloos.img
+SRC = ipl.nas
+IMG = os.img
+IPL = ipl.bin
+LST = ipl.list
 
-all: run
+all: ipl.nas
+	make $(IPL)
+	make $(IMG)
+	make run
 
-run: $(TARGET)
-	qemu-system-x86_64 $(TARGET)
+$(IPL): $(SRC)
+	nasm $(SRC) -o $(IPL) -l $(LST)
 
-$(TARGET): $(SRC)
-	nasm $(SRC) -o $(TARGET)
+$(IMG): $(IPL)
+	mformat -f 1440 -C -B $(IPL) -i $(IMG)
 
-clean: $(TARGET)
-	rm $(TARGET)
+run: $(IMG)
+	qemu-system-x86_64 $(IMG)
+
+clean: $(IMG) $(IPL) $(LST)
+	rm $(IMG) $(IPL) $(LST)
