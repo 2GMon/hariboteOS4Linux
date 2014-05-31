@@ -7,7 +7,8 @@
 * make
 * nasm
 * qemu
-* mformat
+* mtools
+* gcc
 
 ## LICENSE
 
