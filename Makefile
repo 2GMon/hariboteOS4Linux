@@ -15,7 +15,7 @@ $(IMG): $(IPL)
 	mformat -f 1440 -C -B $(IPL) -i $(IMG)
 
 run: $(IMG)
-	qemu-system-x86_64 $(IMG)
+	qemu-system-x86_64 -fda $(IMG)
 
 clean: $(IMG) $(IPL) $(LST)
 	rm $(IMG) $(IPL) $(LST)
