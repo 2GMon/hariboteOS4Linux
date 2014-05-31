@@ -1,4 +1,6 @@
 ; Copyright (c) 2014 Takaaki TSUJIMOTO
+CYLS EQU  10    ; どこまで読み込むか
+
     ORG  0x7c00   ; このプログラムがどこに読み込まれるのか
 
 ; 以下は標準的なFAT12フォーマットフロッピーディスクのための記述
@@ -62,6 +64,14 @@ next:
     ADD CL,1      ; CLに1を足す
     CMP CL,18     ; CLと18を比較
     JBE readloop  ; CL <= 18 だったらreadloopへ
+    MOV CL,1
+    ADD DH,1
+    CMP DH,2
+    JB readloop   ; DH < 2 だったらreadloopへ
+    MOV DH,0
+    ADD CH,1
+    CMP CH,CYLS
+    JB readloop   ; CH < CYLS だったらreadloopへ
 
 ; 読み終わったけどとりあえずやることないので寝る
 
@@ -88,4 +98,4 @@ msg:
 
     TIMES 0x01fe-($-$$) DB 0 ; 0x7dfe(ORGが0x7c00なので0x7c00 + 0x01fe = 0x7dfe)までを0x00で埋める命令
 
-    DB  0x55, 0xaa
+    DB 0x55, 0xaa
