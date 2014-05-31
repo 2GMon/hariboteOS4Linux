@@ -39,7 +39,7 @@ entry:
     MOV CH,0   ; シリンダ0
     MOV DH,0   ; ヘッド0
     MOV CL,2   ; セクタ2
-
+readloop:
     MOV SI,0   ; 失敗回数を数えるレジスタ
 retry:
     MOV AH,0x02 ; AH=0x02 : ディスク読み込み
@@ -47,7 +47,7 @@ retry:
     MOV BX,0
     MOV DL,0x00 ; Aドライブ
     INT 0x13    ; ディスクBIOS呼び出し
-    JNC fin     ; エラーがおきなければfinへ
+    JNC next    ; エラーがおきなければnextへ
     ADD SI,1    ; SIに1を足す
     CMP SI,5    ; SIと5を比較
     JAE error   ; SI >= 5 だったらerrorへ
@@ -55,6 +55,13 @@ retry:
     MOV DL,0x00 ; Aドライブ
     INT 0x13    ; ドライブのリセット
     JMP retry
+next:
+    MOV AX,ES     ; アドレスを0x200進める
+    ADD AX,0x0020
+    MOV ES,AX     ; ADD ES,0x020 という命令がないのでこうしている
+    ADD CL,1      ; CLに1を足す
+    CMP CL,18     ; CLと18を比較
+    JBE readloop  ; CL <= 18 だったらreadloopへ
 
 ; 読み終わったけどとりあえずやることないので寝る
 
@@ -74,10 +81,10 @@ putloop:
     INT 0x10    ; ビデオBIOS呼び出し
     JMP putloop
 msg:
-    DB  0x0a, 0x0a   ; 改行を2つ
-    DB  "load error"
-    DB  0x0a         ; 改行
-    DB  0
+    DB 0x0a, 0x0a   ; 改行を2つ
+    DB "load error"
+    DB 0x0a         ; 改行
+    DB 0
 
     TIMES 0x01fe-($-$$) DB 0 ; 0x7dfe(ORGが0x7c00なので0x7c00 + 0x01fe = 0x7dfe)までを0x00で埋める命令
 
