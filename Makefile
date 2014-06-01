@@ -12,21 +12,21 @@ all: $(IMG)
 $(IPL): $(SRC)
 	nasm $(SRC) -o $(IPL) -l $(LST)
 
-$(FNC).bin: $(FNC).nas
-	nasm $(FNC).nas -f elf32 -o $(FNC).bin -l $(FNC).list
+$(FNC).o: $(FNC).nas
+	nasm $(FNC).nas -f elf32 -o $(FNC).o -l $(FNC).list
 
-$(PCK).bin: $(PCK).c $(FNC).bin
+$(PCK).bin: $(PCK).c $(FNC).o
 	gcc $(PCK).c -nostdlib -m32 -Wl,--oformat=binary -c -o $(PCK).o
-	ld -T harimain.ls -m elf_i386 -o $(PCK).bin --oformat=binary $(PCK).o $(FNC).bin
+	ld -T harimain.ls -m elf_i386 -o $(PCK).bin --oformat=binary $(PCK).o $(FNC).o
 
 $(BIN).bin: $(BIN).nas $(PCK).bin
 	echo "$^"
-	nasm $(BIN).nas -o $(BIN)_tmp.bin
-	cat $(BIN)_tmp.bin $(PCK).bin > $(BIN).bin
+	nasm $(BIN).nas -o $(BIN).bin
+	cat $(BIN).bin $(PCK).bin > os.bin
 
 $(IMG): $(IPL) $(BIN).bin $(PCK).bin
 	mformat -f 1440 -C -B $(IPL) -i $(IMG)
-	mcopy $(BIN).bin -i $(IMG) ::
+	mcopy os.bin -i $(IMG) ::
 
 run: $(IMG)
 	qemu-system-x86_64 -fda $(IMG)
