@@ -37,8 +37,6 @@ struct BOOTINFO {
 
 void HariMain(void)
 {
-    char *vram;
-    int xsize, ysize;
     struct BOOTINFO *binfo;
 
     init_palette(); /* パレットを設定 */
