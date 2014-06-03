@@ -1,42 +1,36 @@
-SRC = ipl10.nas
-IMG = os.img
-IPL = ipl.bin
-LST = ipl.list
-BIN = asmhead
-PCK = bootpack
-FNC = func
-FONT = hankaku
+.SUFFIXES: .nas .o
+.SUFFIXES: .c .o
 
-all: $(IMG)
+.nas.o:
+	nasm $< -f elf32 -o $@ -l $(@:.o=.list)
+
+.c.o:
+	gcc $< -m32 -c -o $@
+
+all: os.img
 	make run
 
-$(IPL): $(SRC)
-	nasm $(SRC) -o $(IPL) -l $(LST)
+ipl.bin: ipl10.nas
+	nasm $^ -o $@ -l $(@:.bin=.list)
 
-$(FNC).o: $(FNC).nas
-	nasm $(FNC).nas -f elf32 -o $(FNC).o -l $(FNC).list
+hankaku.c: hankaku.txt
+	ruby makefont.rb $^ $@
 
-$(FONT).c: $(FONT).txt
-	ruby makefont.rb $(FONT).txt $(FONT).c
+asmhead.bin: asmhead.nas
+	nasm $^ -o $@
 
-$(FONT).o: $(FONT).c
-	gcc $(FONT).c -m32 -c -o $(FONT).o
+bootpack.bin: bootpack.o func.o hankaku.o
+	ld -T harimain.ls -m elf_i386 -o $@ $^
 
-$(PCK).bin: $(PCK).c $(FNC).o $(FONT).o
-	gcc $(PCK).c -m32 -c -o $(PCK).o
-	ld -T harimain.ls -m elf_i386 -o $(PCK).bin $(PCK).o $(FNC).o $(FONT).o
+os.bin: asmhead.bin bootpack.bin
+	cat $^ > $@
 
-$(BIN).bin: $(BIN).nas $(PCK).bin
-	echo "$^"
-	nasm $(BIN).nas -o $(BIN).bin
-	cat $(BIN).bin $(PCK).bin > os.bin
+os.img: ipl.bin os.bin
+	mformat -f 1440 -C -B ipl.bin -i $@
+	mcopy os.bin -i $@ ::
 
-$(IMG): $(IPL) $(BIN).bin $(PCK).bin
-	mformat -f 1440 -C -B $(IPL) -i $(IMG)
-	mcopy os.bin -i $(IMG) ::
-
-run: $(IMG)
-	qemu-system-x86_64 -fda $(IMG)
+run: os.img
+	qemu-system-x86_64 -fda os.img
 
 clean:
-	rm *.o *.bin $(IMG) *.list $(FONT).c
+	rm *.o *.bin os.img *.list hankaku.c
