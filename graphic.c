@@ -125,6 +125,7 @@ int lsprintf(char *str, const char *fmt, ...)
             *str++ = *p; cnt++;
         }
     }
+    *str++ = '\0';
     return cnt;
 }
 
@@ -137,17 +138,21 @@ void strcls(char *str)
 // 数値を16進数文字列に変換する
 void int2hex(char *s, int value)
 {
-    s[0] = '0', s[1] = 'x';
-    int i, filter = 0x0000000f;
-    s += 2;
-    for(i = 0; i < 8; i++) {
-        if(((value >> (7-i)*4) & filter) >= 10) {
-            *s++ = 'A' + ((value >> (7-i)*4) & filter) - 10;
-        } else {
-            *s++ = '0' + ((value >> (7-i)*4) & filter);
+    int i, num_of_digits, tmp;
+    for (i = 0, tmp = value; tmp > 0x0F; i++) {
+        tmp /= 16;
+    }
+    for (; i >= 0; i--) {
+        tmp = value;
+        tmp = (tmp >> (4 * i)) & 0x0F;
+        if (tmp < 0x0A) {
+            *s++ = '0' + tmp;
+        }
+        else {
+            *s++ = 'A' + (tmp - 0x0A);
         }
     }
-    *s = '\0';
+    *s++ = '\0';
 }
 
 // 10進数valueのn桁目を返す
