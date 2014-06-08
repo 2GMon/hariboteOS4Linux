@@ -1,6 +1,8 @@
 .SUFFIXES: .nas .o
 .SUFFIXES: .c .o
 
+LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o
+
 .nas.o:
 	nasm $< -f elf32 -o $@ -l $(@:.o=.list)
 
@@ -19,7 +21,7 @@ hankaku.c: hankaku.txt
 asmhead.bin: asmhead.nas
 	nasm $^ -o $@
 
-bootpack.bin: bootpack.o func.o hankaku.o dsctbl.o graphic.o int.o fifo.o
+bootpack.bin: bootpack.o func.o hankaku.o dsctbl.o graphic.o int.o fifo.o $(LIB)
 	ld -T harimain.ls -m elf_i386 -o $@ $^
 
 os.bin: asmhead.bin bootpack.bin

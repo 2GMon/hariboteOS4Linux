@@ -29,11 +29,6 @@ void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, i
 void init_screen(char *vram, int x, int y);
 void putfont8(char *vram, int xsize, int x, int y, char color, char *font);
 void putfonts8_asc(char *vram, int xsize, int x, int y, char color, unsigned char *str);
-int lsprintf(char *str, const char *fmt, ...);
-void strcls(char *str);
-void int2hex(char *s, int value);
-int figure(int value, int n);
-void int2dec(char *s, int value);
 void init_mouse_cursor8(char *mouse, char bc);
 void putblock8_8(char *vram, int vxsize, int pxsize,
         int pysize, int px0, int py0, char *buf, int bxsize);
