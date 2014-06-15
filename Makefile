@@ -21,7 +21,7 @@ hankaku.c: hankaku.txt
 asmhead.bin: asmhead.nas
 	nasm $^ -o $@
 
-bootpack.bin: bootpack.o func.o hankaku.o dsctbl.o graphic.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o $(LIB)
+bootpack.bin: bootpack.o func.o hankaku.o dsctbl.o graphic.o int.o fifo.o keyboard.o mouse.o memory.o sheet.o timer.o $(LIB)
 	ld -T harimain.ls -m elf_i386 -o $@ $^
 
 os.bin: asmhead.bin bootpack.bin

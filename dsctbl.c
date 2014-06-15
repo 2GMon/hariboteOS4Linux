@@ -26,6 +26,7 @@ void init_gdtidt(void)
      * セグメント番号2番にasm_inthandler*が所属している
      * セグメント番号の下位3ビットは0でなければならないので左シフトしている
      */
+    set_gatedesc(idt + 0x20, (int) asm_inthandler20, 2 << 3, AR_INTGATE32);
     set_gatedesc(idt + 0x21, (int) asm_inthandler21, 2 << 3, AR_INTGATE32);
     set_gatedesc(idt + 0x27, (int) asm_inthandler27, 2 << 3, AR_INTGATE32);
     set_gatedesc(idt + 0x2c, (int) asm_inthandler2c, 2 << 3, AR_INTGATE32);

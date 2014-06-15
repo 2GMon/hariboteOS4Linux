@@ -10,8 +10,10 @@
     GLOBAL io_load_eflags, io_store_eflags
     GLOBAL load_gdtr, load_idtr
     GLOBAL load_cr0, store_cr0
-    GLOBAL asm_inthandler21, asm_inthandler27, asm_inthandler2c
-    EXTERN inthandler21, inthandler27, inthandler2c
+    GLOBAL asm_inthandler20, asm_inthandler21
+    GLOBAL asm_inthandler27, asm_inthandler2c
+    EXTERN inthandler20, inthandler21
+    EXTERN inthandler27, inthandler2c
 
 
 ; 以下は実際の関数
@@ -102,6 +104,22 @@ store_cr0:  ; void store_cr0(int cr0);
     MOV     EAX,[ESP+4]
     MOV     CR0,EAX
     RET
+
+asm_inthandler20:
+    PUSH    ES
+    PUSH    DS
+    PUSHAD
+    MOV     EAX,ESP
+    PUSH    EAX
+    MOV     AX,SS
+    MOV     DS,AX
+    MOV     ES,AX
+    CALL    inthandler20
+    POP     EAX
+    POPAD
+    POP     DS
+    POP     ES
+    IRETD
 
 asm_inthandler21:
     PUSH    ES
