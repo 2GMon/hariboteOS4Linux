@@ -84,6 +84,7 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar);
 #define LIMIT_BOTPAK    0x0007ffff
 #define AR_DATA32_RW    0x4092
 #define AR_CODE32_ER    0x409a
+#define AR_TSS32        0x0089
 #define AR_INTGATE32    0x008e
 
 /* int.c */
@@ -180,3 +181,8 @@ void timer_free(struct TIMER *timer);
 void timer_init(struct TIMER *timer, struct FIFO32 *fifo, int data);
 void timer_settime(struct TIMER *timer, unsigned int timeout);
 void inthandler20(int *esp);
+
+/* mtask.c */
+extern struct TIMER *mt_timer;
+void mt_init(void);
+void mt_taskswitch(void);

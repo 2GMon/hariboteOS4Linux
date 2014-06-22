@@ -10,8 +10,10 @@
     GLOBAL io_load_eflags, io_store_eflags
     GLOBAL load_gdtr, load_idtr
     GLOBAL load_cr0, store_cr0
+    GLOBAL load_tr
     GLOBAL asm_inthandler20, asm_inthandler21
     GLOBAL asm_inthandler27, asm_inthandler2c
+    GLOBAL farjmp
     EXTERN inthandler20, inthandler21
     EXTERN inthandler27, inthandler2c
 
@@ -105,6 +107,10 @@ store_cr0:  ; void store_cr0(int cr0);
     MOV     CR0,EAX
     RET
 
+load_tr:    ; void load_tr(int tr);
+    LTR     [ESP+4]     ; tr
+    RET
+
 asm_inthandler20:
     PUSH    ES
     PUSH    DS
@@ -168,3 +174,7 @@ asm_inthandler2c:
     POP     DS
     POP     ES
     IRETD
+
+farjmp:        ; void farjmp(int eip, int cs);
+    JMP     FAR [ESP+4]     ; eip, cs
+    RET
