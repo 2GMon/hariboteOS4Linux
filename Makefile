@@ -1,7 +1,7 @@
 .SUFFIXES: .nas .o
 .SUFFIXES: .c .o
 
-LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o
+LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o
 
 .nas.o:
 	nasm $< -f elf32 -o $@ -l $(@:.o=.list)
