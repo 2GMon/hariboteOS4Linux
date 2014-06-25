@@ -30,6 +30,8 @@ os.bin: asmhead.bin bootpack.bin
 os.img: ipl.bin os.bin
 	mformat -f 1440 -C -B ipl.bin -i $@
 	mcopy os.bin -i $@ ::
+	mcopy bootpack.bin -i $@ ::
+	mcopy Makefile -i $@ ::
 
 run: os.img
 	qemu-system-x86_64 -fda os.img
