@@ -27,17 +27,17 @@ bootpack.bin: bootpack.o func.o hankaku.o dsctbl.o graphic.o int.o fifo.o keyboa
 os.bin: asmhead.bin bootpack.bin
 	cat $^ > $@
 
-hlt.hrb: hlt.nas
+hello.hrb: hello.nas
 	nasm $^ -o $@
 
-os.img: ipl.bin os.bin bootpack.bin hlt.hrb
+os.img: ipl.bin os.bin bootpack.bin hello.hrb
 	mformat -f 1440 -C -B ipl.bin -i $@
 	mcopy os.bin -i $@ ::
 	mcopy bootpack.bin -i $@ ::
-	mcopy hlt.hrb -i $@ ::
+	mcopy hello.hrb -i $@ ::
 
 run: os.img
 	qemu-system-x86_64 -fda os.img
 
 clean:
-	rm *.o *.bin os.img *.list hankaku.c
+	rm *.o *.bin os.img *.list *.hrb hankaku.c
