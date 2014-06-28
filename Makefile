@@ -1,5 +1,6 @@
 .SUFFIXES: .nas .o
 .SUFFIXES: .c .o
+.SUFFIXES: .nas .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
 
@@ -8,6 +9,9 @@ LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp
 
 .c.o:
 	gcc $< -m32 -c -o $@
+
+.nas.hrb:
+	nasm $< -o $@
 
 all: os.img
 	make run
@@ -27,14 +31,12 @@ bootpack.bin: bootpack.o func.o hankaku.o dsctbl.o graphic.o int.o fifo.o keyboa
 os.bin: asmhead.bin bootpack.bin
 	cat $^ > $@
 
-hello.hrb: hello.nas
-	nasm $^ -o $@
-
-os.img: ipl.bin os.bin bootpack.bin hello.hrb
+os.img: ipl.bin os.bin bootpack.bin hello.hrb hello2.hrb
 	mformat -f 1440 -C -B ipl.bin -i $@
 	mcopy os.bin -i $@ ::
 	mcopy bootpack.bin -i $@ ::
 	mcopy hello.hrb -i $@ ::
+	mcopy hello2.hrb -i $@ ::
 
 run: os.img
 	qemu-system-x86_64 -fda os.img
