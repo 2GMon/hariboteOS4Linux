@@ -38,7 +38,7 @@ a.hrb: a.o a_nas.o
 hello3.hrb: hello3.o a_nas.o
 	ld -T app.ls -m elf_i386 -o $@ $^
 
-crack1.hrb: crack1.o
+crack1.hrb: crack1.o a_nas.o
 	ld -T app.ls -m elf_i386 -o $@ $^
 
 os.img: ipl.bin os.bin bootpack.bin $(APP)

@@ -1,3 +1,5 @@
+; Copyright (c) 2014 Takaaki TSUJIMOTO
+
 [BITS 32]
     MOV ECX,msg
     MOV EDX,1
@@ -9,6 +11,7 @@ putloop:
     ADD ECX,1
     JMP putloop
 fin:
-    RETF
+    MOV EDX,4
+    INT 0x40
 msg:
     DB  "hello",0
