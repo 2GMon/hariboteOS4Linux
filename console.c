@@ -236,7 +236,8 @@ void cmd_dir(struct CONSOLE *cons)
 void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline)
 {
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
-    struct FILEINFO *finfo = file_search(cmdline + 5, (struct FILEINFO *) (ADR_DISKIMG + 0x002600), 224);
+    int x = (cmdline[0] == 't') ? 5 : 4;
+    struct FILEINFO *finfo = file_search(cmdline + x, (struct FILEINFO *) (ADR_DISKIMG + 0x002600), 224);
     char *p;
     if (finfo != 0) {
         /* ファイルが見つかった場合 */
