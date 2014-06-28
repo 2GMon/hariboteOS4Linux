@@ -3,4 +3,5 @@
 *.list
 *.s
 *.o
+*.hrb
 hankaku.c
