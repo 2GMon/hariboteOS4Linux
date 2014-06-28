@@ -31,12 +31,20 @@ bootpack.bin: bootpack.o func.o hankaku.o dsctbl.o graphic.o int.o fifo.o keyboa
 os.bin: asmhead.bin bootpack.bin
 	cat $^ > $@
 
-os.img: ipl.bin os.bin bootpack.bin hello.hrb hello2.hrb
+a.hrb: a.o a_nas.o
+	ld -T app.ls -m elf_i386 -o $@ $^
+
+hello3.hrb: hello3.o a_nas.o
+	ld -T app.ls -m elf_i386 -o $@ $^
+
+os.img: ipl.bin os.bin bootpack.bin hello.hrb hello2.hrb a.hrb hello3.hrb
 	mformat -f 1440 -C -B ipl.bin -i $@
 	mcopy os.bin -i $@ ::
 	mcopy bootpack.bin -i $@ ::
 	mcopy hello.hrb -i $@ ::
 	mcopy hello2.hrb -i $@ ::
+	mcopy a.hrb -i $@ ::
+	mcopy hello3.hrb -i $@ ::
 
 run: os.img
 	qemu-system-x86_64 -fda os.img
