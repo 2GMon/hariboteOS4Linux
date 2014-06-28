@@ -178,7 +178,7 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int mem
     } else if (cmdline[0] != 0) {
         if (cmd_app(cons, fat, cmdline) == 0) {
             /* コマンドではなく、アプリでもなく、さらに空行でもない */
-            cons_putstr0(cons, "Bad command.¥n¥n");
+            cons_putstr0(cons, "Bad command.\n\n");
         }
     }
     return;
@@ -188,7 +188,7 @@ void cmd_mem(struct CONSOLE *cons, unsigned int memtotal)
 {
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
     char s[60];
-    sprintf(s, "total   %dMB¥nfree %dKB¥n¥n", memtotal / (1024 * 1024), memman_total(memman) / 1024);
+    sprintf(s, "total   %dMB\nfree %dKB\n\n", memtotal / (1024 * 1024), memman_total(memman) / 1024);
     cons_putstr0(cons, s);
     return;
 }
@@ -218,7 +218,7 @@ void cmd_dir(struct CONSOLE *cons)
         }
         if (finfo[i].name[0] != 0xe5) {
             if ((finfo[i].type & 0x18) == 0) {
-                sprintf(s, "filename.ext   %7d¥n", finfo[i].size);
+                sprintf(s, "filename.ext   %7d\n", finfo[i].size);
                 for (j = 0; j < 8; j++) {
                     s[j] = finfo[i].name[j];
                 }
@@ -246,7 +246,7 @@ void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline)
         memman_free_4k(memman, (int) p, finfo->size);
     } else {
         /* ファイルが見つからなかった場合 */
-        cons_putstr0(cons, "File not found.¥n");
+        cons_putstr0(cons, "File not found.\n");
     }
     cons_newline(cons);
     return;
