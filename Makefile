@@ -3,6 +3,7 @@
 .SUFFIXES: .nas .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
+APP = a.hrb hello.hrb hello2.hrb hello3.hrb
 
 .nas.o:
 	nasm $< -f elf32 -o $@ -l $(@:.o=.list)
@@ -37,14 +38,11 @@ a.hrb: a.o a_nas.o
 hello3.hrb: hello3.o a_nas.o
 	ld -T app.ls -m elf_i386 -o $@ $^
 
-os.img: ipl.bin os.bin bootpack.bin hello.hrb hello2.hrb a.hrb hello3.hrb
+os.img: ipl.bin os.bin bootpack.bin $(APP)
 	mformat -f 1440 -C -B ipl.bin -i $@
 	mcopy os.bin -i $@ ::
 	mcopy bootpack.bin -i $@ ::
-	mcopy hello.hrb -i $@ ::
-	mcopy hello2.hrb -i $@ ::
-	mcopy a.hrb -i $@ ::
-	mcopy hello3.hrb -i $@ ::
+	mcopy $(APP) -i $@ ::
 
 run: os.img
 	qemu-system-x86_64 -fda os.img
