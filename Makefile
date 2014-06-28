@@ -3,7 +3,7 @@
 .SUFFIXES: .nas .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
-APP = a.hrb hello.hrb hello2.hrb hello3.hrb crack1.hrb
+APP = a.hrb hello.hrb hello2.hrb hello3.hrb crack1.hrb crack2.hrb
 
 .nas.o:
 	nasm $< -f elf32 -o $@ -l $(@:.o=.list)
