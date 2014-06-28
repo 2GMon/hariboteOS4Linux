@@ -3,7 +3,7 @@
 .SUFFIXES: .nas .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
-APP = a.hrb hello.hrb hello2.hrb hello3.hrb
+APP = a.hrb hello.hrb hello2.hrb hello3.hrb crack1.hrb
 
 .nas.o:
 	nasm $< -f elf32 -o $@ -l $(@:.o=.list)
@@ -36,6 +36,9 @@ a.hrb: a.o a_nas.o
 	ld -T app.ls -m elf_i386 -o $@ $^
 
 hello3.hrb: hello3.o a_nas.o
+	ld -T app.ls -m elf_i386 -o $@ $^
+
+crack1.hrb: crack1.o
 	ld -T app.ls -m elf_i386 -o $@ $^
 
 os.img: ipl.bin os.bin bootpack.bin $(APP)
