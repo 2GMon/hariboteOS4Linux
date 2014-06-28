@@ -27,11 +27,14 @@ bootpack.bin: bootpack.o func.o hankaku.o dsctbl.o graphic.o int.o fifo.o keyboa
 os.bin: asmhead.bin bootpack.bin
 	cat $^ > $@
 
-os.img: ipl.bin os.bin
+hlt.hrb: hlt.nas
+	nasm $^ -o $@
+
+os.img: ipl.bin os.bin bootpack.bin hlt.hrb
 	mformat -f 1440 -C -B ipl.bin -i $@
 	mcopy os.bin -i $@ ::
 	mcopy bootpack.bin -i $@ ::
-	mcopy Makefile -i $@ ::
+	mcopy hlt.hrb -i $@ ::
 
 run: os.img
 	qemu-system-x86_64 -fda os.img
