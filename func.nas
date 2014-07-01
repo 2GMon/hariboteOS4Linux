@@ -13,12 +13,12 @@
     GLOBAL load_tr
     GLOBAL asm_inthandler20, asm_inthandler21
     GLOBAL asm_inthandler27, asm_inthandler2c
-    GLOBAL asm_inthandler0d
+    GLOBAL asm_inthandler0c, asm_inthandler0d
     GLOBAL farjmp, farcall
     GLOBAL asm_hrb_api, start_app
     EXTERN inthandler20, inthandler21
     EXTERN inthandler27, inthandler2c
-    EXTERN inthandler0d
+    EXTERN inthandler0c, inthandler0d
     EXTERN hrb_api
 
 
@@ -178,6 +178,26 @@ asm_inthandler2c:
     POPAD
     POP     DS
     POP     ES
+    IRETD
+
+asm_inthandler0c:
+    STI
+    PUSH    ES
+    PUSH    DS
+    PUSHAD
+    MOV     EAX,ESP
+    PUSH    EAX
+    MOV     AX,SS
+    MOV     DS,AX
+    MOV     ES,AX
+    CALL    inthandler0c
+    CMP     EAX,0
+    JNE     end_app
+    POP     EAX
+    POPAD
+    POP     DS
+    POP     ES
+    ADD     ESP,4   ; INT 0x0c でも、これが必要
     IRETD
 
 asm_inthandler0d:
