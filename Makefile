@@ -3,7 +3,7 @@
 .SUFFIXES: .nas .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
-APP = a.hrb hello.hrb hello2.hrb hello3.hrb bug1.hrb bug2.hrb bug3.hrb
+APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb bug1.hrb bug2.hrb bug3.hrb
 
 .nas.o:
 	nasm $< -f elf32 -o $@ -l $(@:.o=.list)
@@ -36,6 +36,9 @@ a.hrb: a.o a_nas.o
 	ld -T app.ls -m elf_i386 -o $@ $^
 
 hello3.hrb: hello3.o a_nas.o
+	ld -T app.ls -m elf_i386 -o $@ $^
+
+hello4.hrb: hello4.o a_nas.o
 	ld -T app.ls -m elf_i386 -o $@ $^
 
 bug1.hrb: bug1.o a_nas.o
