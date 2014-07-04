@@ -1,9 +1,11 @@
 .SUFFIXES: .nas .o
 .SUFFIXES: .c .o
 .SUFFIXES: .nas .hrb
+.SUFFIXES: .c .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
 APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb hello5.hrb bug1.hrb bug2.hrb bug3.hrb
+APP_LIB = a_nas.o
 
 .nas.o:
 	nasm $< -f elf32 -o $@ -l $(@:.o=.list)
@@ -14,6 +16,10 @@ APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb hello5.hrb bug1.hrb bug2.
 .nas.hrb:
 	nasm $< -f elf32 -o $(@:.hrb=.o) -l $(@:.hrb=.list)
 	ld -T app.ls -m elf_i386 -o $@ $(@:.hrb=.o)
+
+.c.hrb:
+	gcc $< -m32 -c -o $(@:.hrb=.o)
+	ld -T app.ls -m elf_i386 -o $@ $(@:.hrb=.o) $(APP_LIB)
 
 all: os.img
 	make run
@@ -33,29 +39,13 @@ bootpack.bin: bootpack.o func.o hankaku.o dsctbl.o graphic.o int.o fifo.o keyboa
 os.bin: asmhead.bin bootpack.bin
 	cat $^ > $@
 
-a.hrb: a.o a_nas.o
-	ld -T app.ls -m elf_i386 -o $@ $^
-
-hello3.hrb: hello3.o a_nas.o
-	ld -T app.ls -m elf_i386 -o $@ $^
-
-hello4.hrb: hello4.o a_nas.o
-	ld -T app.ls -m elf_i386 -o $@ $^
-
-bug1.hrb: bug1.o a_nas.o
-	ld -T app.ls -m elf_i386 -o $@ $^
-
-bug2.hrb: bug2.o a_nas.o
-	ld -T app.ls -m elf_i386 -o $@ $^
-
-bug3.hrb: bug3.o a_nas.o
-	ld -T app.ls -m elf_i386 -o $@ $^
-
 os.img: ipl.bin os.bin bootpack.bin $(APP)
 	mformat -f 1440 -C -B ipl.bin -i $@
 	mcopy os.bin -i $@ ::
 	mcopy bootpack.bin -i $@ ::
 	mcopy $(APP) -i $@ ::
+
+$(APP): $(APP_LIB)
 
 run: os.img
 	qemu-system-x86_64 -fda os.img
