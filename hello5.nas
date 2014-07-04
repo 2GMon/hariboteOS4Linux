@@ -1,7 +1,6 @@
 ; Copyright (c) 2014 Takaaki TSUJIMOTO
 
 [BITS 32]
-
     GLOBAL HariMain
 
 [SECTION .text]
@@ -16,4 +15,4 @@ HariMain:
 [SECTION .data]
 
 msg:
-    DB  "hello",0
+    DB  "hello, world", 0x0a, 0

@@ -3,7 +3,7 @@
 .SUFFIXES: .nas .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
-APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb bug1.hrb bug2.hrb bug3.hrb
+APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb hello5.hrb bug1.hrb bug2.hrb bug3.hrb
 
 .nas.o:
 	nasm $< -f elf32 -o $@ -l $(@:.o=.list)
@@ -12,7 +12,8 @@ APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb bug1.hrb bug2.hrb bug3.hr
 	gcc $< -m32 -c -o $@
 
 .nas.hrb:
-	nasm $< -o $@
+	nasm $< -f elf32 -o $(@:.hrb=.o) -l $(@:.hrb=.list)
+	ld -T app.ls -m elf_i386 -o $@ $(@:.hrb=.o)
 
 all: os.img
 	make run
