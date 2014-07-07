@@ -4,7 +4,7 @@
 .SUFFIXES: .c .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
-APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb hello5.hrb winhello.hrb winhelo2.hrb winhelo3.hrb
+APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb hello5.hrb winhello.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb
 APP_LIB = a_nas.o
 
 .nas.o:
@@ -44,6 +44,10 @@ os.img: ipl.bin os.bin bootpack.bin $(APP)
 	mcopy os.bin -i $@ ::
 	mcopy bootpack.bin -i $@ ::
 	mcopy $(APP) -i $@ ::
+
+stars.hrb: stars.c $(APP_LIB) rand.o
+	gcc $< -m32 -c -o $(@:.hrb=.o)
+	ld -T app.ls -m elf_i386 -o $@ $(@:.hrb=.o) $(APP_LIB) rand.o
 
 $(APP): $(APP_LIB)
 
