@@ -4,7 +4,7 @@
 .SUFFIXES: .c .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
-APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb hello5.hrb winhello.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb
+APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb hello5.hrb winhello.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb
 APP_LIB = a_nas.o
 
 .nas.o:
