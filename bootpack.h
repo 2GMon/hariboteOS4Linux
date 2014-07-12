@@ -236,8 +236,9 @@ void make_wtitle8(unsigned char *buf, int xsize, char *title, char act);
 
 /* console.c */
 struct CONSOLE {
-	struct SHEET *sht;
-	int cur_x, cur_y, cur_c;
+    struct SHEET *sht;
+    int cur_x, cur_y, cur_c;
+    struct TIMER *timer;
 };
 void console_task(struct SHEET *sheet, unsigned int memtotal);
 void cons_putchar(struct CONSOLE *cons, int chr, char move);
