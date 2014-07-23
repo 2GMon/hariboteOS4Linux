@@ -4,7 +4,7 @@
 .SUFFIXES: .c .hrb
 
 LIB = sprintf.o vsprintf.o strtol.o strtoul0.o strtoul.o strlen.o errno.o strcmp.o strncmp.o
-APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb hello5.hrb winhello.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb
+APP = a.hrb hello.hrb hello2.hrb hello3.hrb hello4.hrb hello5.hrb winhello.hrb winhelo2.hrb winhelo3.hrb star1.hrb stars.hrb stars2.hrb lines.hrb walk.hrb noodle.hrb
 APP_LIB = a_nas.o
 
 .nas.o:
@@ -52,6 +52,10 @@ stars.hrb: stars.c $(APP_LIB) rand.o
 stars2.hrb: stars2.c $(APP_LIB) rand.o
 	gcc $< -m32 -c -o $(@:.hrb=.o)
 	ld -T app.ls -m elf_i386 -o $@ $(@:.hrb=.o) $(APP_LIB) rand.o
+
+noodle.hrb: noodle.c $(APP_LIB) $(LIB)
+	gcc $< -m32 -c -o $(@:.hrb=.o)
+	ld -T app.ls -m elf_i386 -o $@ $(@:.hrb=.o) $(APP_LIB) $(LIB)
 
 $(APP): $(APP_LIB)
 
