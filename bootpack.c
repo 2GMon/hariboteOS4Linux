@@ -198,7 +198,7 @@ void HariMain(void)
                 if (i == 256 + 0x3b && key_shift != 0) { /* Shift+F1 */
                     task = key_win->task;
                     if (task != 0 && task->tss.ss0 != 0) {  /* Shift+F1 */
-                        cons_putstr0(task->cons, "¥nBreak(key) :¥n");
+                        cons_putstr0(task->cons, "\nBreak(key) :\n");
                         io_cli();   /* 強制終了処理中にタスクが変わると困るから */
                         task->tss.eax = (int) &(task->tss.esp0);
                         task->tss.eip = (int) asm_end_app;
