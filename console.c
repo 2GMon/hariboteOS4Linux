@@ -8,7 +8,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 {
     struct TASK *task = task_now();
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
-    int i, fifobuf[128], *fat = (int *) memman_alloc_4k(memman, 4 * 2880);
+    int i, *fat = (int *) memman_alloc_4k(memman, 4 * 2880);
     struct CONSOLE cons;
     char cmdline[30];
     cons.sht = sheet;
@@ -17,7 +17,6 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     cons.cur_c = -1;
     task->cons = &cons;
 
-    fifo32_init(&task->fifo, 128, fifobuf, task);
     cons.timer = timer_alloc();
     timer_init(cons.timer, &task->fifo, 1);
     timer_settime(cons.timer, 50);
@@ -174,6 +173,8 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int mem
         cmd_dir(cons);
     } else if (strncmp(cmdline, "type ", 5) == 0 || strncmp(cmdline, "cat ", 4) == 0) {
         cmd_type(cons, fat, cmdline);
+    } else if (strcmp(cmdline, "exit") == 0) {
+        cmd_exit(cons, fat);
     } else if (cmdline[0] != 0) {
         if (cmd_app(cons, fat, cmdline) == 0) {
             /* コマンドではなく、アプリでもなく、さらに空行でもない */
@@ -250,6 +251,22 @@ void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline)
     }
     cons_newline(cons);
     return;
+}
+
+void cmd_exit(struct CONSOLE *cons, int *fat)
+{
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+    struct TASK *task = task_now();
+    struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
+    struct FIFO32 *fifo = (struct FIFO32 *) *((int *) 0x0fec);
+    timer_cancel(cons->timer);
+    memman_free_4k(memman, (int) fat, 4 * 2880);
+    io_cli();
+    fifo32_put(fifo, cons->sht - shtctl->sheets0 + 768);    /* 768〜1023 */
+    io_sti();
+    for (;;) {
+        task_sleep(task);
+    }
 }
 
 int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
