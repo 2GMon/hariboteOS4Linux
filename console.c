@@ -17,7 +17,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     cons.cur_c = -1;
     task->cons = &cons;
 
-    if (sheet != 0) {
+    if (cons.sht != 0) {
         cons.timer = timer_alloc();
         timer_init(cons.timer, &task->fifo, 1);
         timer_settime(cons.timer, 50);
@@ -35,7 +35,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
         } else {
             i = fifo32_get(&task->fifo);
             io_sti();
-            if (i <= 1) { /* カーソル用タイマ */
+            if (i <= 1 && cons.sht != 0) { /* カーソル用タイマ */
                 if (i != 0) {
                     timer_init(cons.timer, &task->fifo, 0); /* 次は0を */
                     if (cons.cur_c >= 0) {
@@ -54,7 +54,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
             }
             if (i == 3) {	/* カーソルOFF */
                 if (sheet != 0) {
-                    boxfill8(sheet->buf, sheet->bxsize, COL8_000000, cons.cur_x, cons.cur_y, cons.cur_x + 7, cons.cur_y + 15);
+                    boxfill8(cons.sht->buf, cons.sht->bxsize, COL8_000000, cons.cur_x, cons.cur_y, cons.cur_x + 7, cons.cur_y + 15);
                 }
                 cons.cur_c = -1;
             }
@@ -76,7 +76,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                     cmdline[cons.cur_x / 8 - 2] = 0;
                     cons_newline(&cons);
                     cons_runcmd(cmdline, &cons, fat, memtotal);	/* コマンド実行 */
-                    if (sheet == 0) {
+                    if (cons.sht == 0) {
                         cmd_exit(&cons, fat);
                     }
                     /* プロンプト表示 */
@@ -91,9 +91,9 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                 }
             }
             /* カーソル再表示 */
-            if (sheet != 0) {
+            if (cons.sht != 0) {
                 if (cons.cur_c >= 0) {
-                    boxfill8(sheet->buf, sheet->bxsize, cons.cur_c, cons.cur_x, cons.cur_y, cons.cur_x + 7, cons.cur_y + 15);
+                    boxfill8(cons.sht->buf, cons.sht->bxsize, cons.cur_c, cons.cur_x, cons.cur_y, cons.cur_x + 7, cons.cur_y + 15);
                 }
                 sheet_refresh(sheet, cons.cur_x, cons.cur_y, cons.cur_x + 8, cons.cur_y + 16);
             }
@@ -183,13 +183,13 @@ void cons_putstr1(struct CONSOLE *cons, char *s, int l)
 
 void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int memtotal)
 {
-    if (strcmp(cmdline, "mem") == 0) {
+    if (strcmp(cmdline, "mem") == 0 && cons->sht != 0) {
         cmd_mem(cons, memtotal);
-    } else if (strcmp(cmdline, "cls") == 0 || strcmp(cmdline, "clear") == 0) {
+    } else if (strcmp(cmdline, "cls") == 0 || strcmp(cmdline, "clear") == 0 && cons->sht != 0) {
         cmd_cls(cons);
-    } else if (strcmp(cmdline, "dir") == 0 || strcmp(cmdline, "ls") == 0) {
+    } else if (strcmp(cmdline, "dir") == 0 || strcmp(cmdline, "ls") == 0 && cons->sht != 0) {
         cmd_dir(cons);
-    } else if (strncmp(cmdline, "type ", 5) == 0 || strncmp(cmdline, "cat ", 4) == 0) {
+    } else if (strncmp(cmdline, "type ", 5) == 0 || strncmp(cmdline, "cat ", 4) == 0 && cons->sht != 0) {
         cmd_type(cons, fat, cmdline);
     } else if (strcmp(cmdline, "exit") == 0) {
         cmd_exit(cons, fat);
@@ -405,6 +405,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
     struct CONSOLE *cons = task->cons;
     struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
     struct SHEET *sht;
+    struct FIFO32 *sys_fifo = (struct FIFO32 *) *((int *) 0x0fec);
     int *reg = &eax + 1;    /* eaxの次の番地 */
         /* 保存のためのPUSHADを強引に書き換える */
         /* reg[0] : EDI,   reg[1] : ESI,   reg[2] : EBP,   reg[3] : ESP */
@@ -481,7 +482,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
             }
             i = fifo32_get(&task->fifo);
             io_sti();
-            if (i <= 1) { /* カーソル用タイマ */
+            if (i <= 1 && cons->sht != 0) { /* カーソル用タイマ */
                 /* アプリ実行中はカーソルが出ないので、いつも次は表示用の1を注文しておく */
                 timer_init(cons->timer, &task->fifo, 1); /* 次は1を */
                 timer_settime(cons->timer, 50);
@@ -491,6 +492,13 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
             }
             if (i == 3) {   /* カーソルOFF */
                 cons->cur_c = -1;
+            }
+            if (i == 4) {   /* コンソールだけを閉じる */
+                timer_cancel(cons->timer);
+                io_cli();
+                fifo32_put(sys_fifo, cons->sht - shtctl->sheets0 + 2024);	/* 2024〜2279 */
+                cons->sht = 0;
+                io_sti();
             }
             if (i >= 256) { /* キーボードデータ（タスクA経由）など */
                 reg[7] = i - 256;
